@@ -1,0 +1,96 @@
+{% extends "catalog/base.html" %}
+
+{% block title %}Новый продукт{% endblock %}
+
+{% block content %}
+<div class="pricing-header p-3 pb-md-4 mx-auto text-center">
+    {% if product %}
+        <h2 class="display-4"><b>Редактировать продукт</b></h2>
+    {% else %}
+        <h2 class="display-4"><b>Новый продукт</b></h2>
+    {% endif %}
+</div>
+
+<div class="container">
+    <div class="row text-start">
+        <form method="post" action="" class="form-floating" enctype="multipart/form-data">
+            <div class="col-7">
+                <div class="card mb-4 box-shadow">
+                    <div class="card-header">
+                        {% if product %}
+                            <h4 class="my-0 font-weight-normal">Изменить {{ product.name }}:</h4>
+                        {% else %}
+                            <h4 class="my-0 font-weight-normal">Добавление нового товара:</h4>
+                        {% endif %}
+                    </div>
+                    <div class="card-body">
+                        {% csrf_token %}
+                        <div class="mb-3 text-bg-warning p-2">
+                            <details>
+                                <summary><i>Справка</i></summary>
+                                <p><u>Запрещённые слова:</u></p>
+                                <ul>
+                                    {% for word in forbidden_words %}
+                                        <li>{{ word }}</li>
+                                    {% endfor %}
+                                </ul>
+                            </details>
+                        </div>
+                        <div class="form-group">
+                            {{ form.non_field_errors }}
+                            <div class="mb-3">
+                                <label for="id_name">Наименование:</label>
+                                {{ form.name }}
+                                {% if form.name.errors %}
+                                    <small class="text-danger">{{ form.name.errors.0 }}</small>
+                                {% endif %}
+                            </div>
+                            {% if user == product.owner or perms.catalog.can_unpublish_product %}
+                                <div class="mb-3">
+                                    <label for="id_publication">Статус публикации:</label>
+                                    {{ form.is_publication }}
+                                    {% if form.is_publication.errors %}
+                                        <small class="text-danger">{{ form.is_publication.errors.0 }}</small>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                            <div class="mb-3">
+                                <label for="id_description">Описание:</label>
+                                {{ form.description }}
+                                {% if form.description.errors %}
+                                    <small class="text-danger">{{ form.description.errors.0 }}</small>
+                                {% endif %}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_photo">Загрузка фото:</label>
+                                <p>{{ form.photo }}</p>
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_category">Выберите категорию:</label>
+                                {{ form.category }}
+                            </div>
+                            <div class="mb-3">
+                                <label for="id_price">Цена:</label>
+                                {{ form.price }}
+                                {% if form.price.errors %}
+                                    <small class="text-danger">{{ form.price.errors.0 }}</small>
+                                {% endif %}
+                            </div>
+                        </div>
+                    </div>
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <a class="me-3 mb-3 btn btn-outline-danger" href="{% url 'catalog:product_list' %}" role="button">Отмена</a>
+                        <button type="submit" class="me-2 btn btn-lg btn-block btn-outline-primary">
+                            {% if product %}
+                                Сохранить
+                            {% else %}
+                                Добавить
+                            {% endif %}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}
